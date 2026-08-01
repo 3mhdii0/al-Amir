@@ -11,63 +11,116 @@ const menu = [
   { name: "1 Kilo Shrimp", price: 20 }
 ];
 
-document.addEventListener("DOMContentLoaded", () => {
+const cart = [];
 
-  const cards = document.querySelectorAll(".card");
-  const order = [];
+const cards = document.querySelectorAll(".card");
+const cartItems = document.getElementById("cart-items");
+const total = document.getElementById("total");
+const whatsappBtn = document.getElementById("whatsappBtn");
 
-  cards.forEach((card, index) => {
-    card.style.cursor = "pointer";
+cards.forEach((card, index) => {
 
-    card.addEventListener("click", () => {
+  card.addEventListener("click", () => {
 
-      let qty = prompt(`Quantity for ${menu[index].name}:`, "1");
+    const found = cart.find(item => item.name === menu[index].name);
 
-      if (qty === null) return;
-
-      qty = parseInt(qty);
-
-      if (isNaN(qty) || qty <= 0) return;
-
-      order.push({
-        item: menu[index].name,
-        qty: qty,
-        price: menu[index].price
+    if(found){
+      found.qty++;
+    }else{
+      cart.push({
+        name: menu[index].name,
+        price: menu[index].price,
+        qty:1
       });
-
-      alert(`${menu[index].name} added to your order.`);
-    });
-  });
-
-  const btn = document.createElement("button");
-
-  btn.innerText = "🛒 Order on WhatsApp";
-
-  btn.style.position = "fixed";
-  btn.style.bottom = "20px";
-  btn.style.right = "20px";
-  btn.style.padding = "15px 22px";
-  btn.style.border = "none";
-  btn.style.borderRadius = "50px";
-  btn.style.background = "#25D366";
-  btn.style.color = "#fff";
-  btn.style.fontWeight = "bold";
-  btn.style.cursor = "pointer";
-  btn.style.zIndex = "9999";
-
-  document.body.appendChild(btn);
-
-  btn.addEventListener("click", () => {
-
-    if (order.length === 0) {
-      alert("Please select at least one item.");
-      return;
+      card.classList.add("selected");
     }
 
-    let total = 0;
+    renderCart();
 
-    let text = "Hello AL AMIR,%0A%0AI would like to order:%0A%0A";
+  });
 
-    order.forEach(item => {
-      total += item.qty * item.price;
-      text += `• ${item.item} x${item.qty} -
+});
+
+function renderCart(){
+
+  cartItems.innerHTML="";
+
+  let sum=0;
+
+  cart.forEach(item=>{
+
+    sum += item.price * item.qty;
+
+    cartItems.innerHTML += `
+      <div class="cart-item">
+        <span>${item.name}</span>
+
+        <input
+        type="number"
+        min="1"
+        value="${item.qty}"
+        onchange="changeQty('${item.name}',this.value)">
+
+        <strong>$${item.price*item.qty}</strong>
+      </div>
+    `;
+
+  });
+
+  total.innerText=sum;
+
+}
+
+function changeQty(name,qty){
+
+  qty=parseInt(qty);
+
+  const item=cart.find(i=>i.name===name);
+
+  if(!item) return;
+
+  if(qty<=0){
+
+    cart.splice(cart.indexOf(item),1);
+
+    cards.forEach(card=>{
+      if(card.querySelector("h3").innerText.includes(name)){
+        card.classList.remove("selected");
+      }
+    });
+
+  }else{
+
+    item.qty=qty;
+
+  }
+
+  renderCart();
+
+}
+
+whatsappBtn.addEventListener("click",()=>{
+
+  if(cart.length===0){
+
+    alert("Please select at least one item.");
+
+    return;
+
+  }
+
+  let text="Hello AL AMIR,%0A%0AI would like to order:%0A";
+  let sum=0;
+
+  cart.forEach(item=>{
+
+    text += `%0A• ${item.name} x${item.qty}`;
+    sum += item.price*item.qty;
+
+  });
+
+  text += `%0A%0ATotal: $${sum}`;
+
+  window.open(`https://wa.me/${phone}?text=${text}`,"_blank");
+
+});
