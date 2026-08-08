@@ -8,7 +8,11 @@ const menu = [
   { name: "Shrimp Sandwich", price: 6 },
   { name: "10 Pieces Shrimp Meal", price: 7 },
   { name: "15 Pieces Shrimp Meal", price: 10 },
-  { name: "1 Kilo Shrimp", price: 20 }
+  { name: "1 Kilo Shrimp", price: 20 },
+  { name: "Chicken Broasted", price: 14 },
+  { name: "Half Chicken Broasted", price: 9 },
+  { name: "5 Pieces Crispy", price: 10 },
+  { name: "Twister Sandwich", price: 6 }
 ];
 
 const cart = [];
